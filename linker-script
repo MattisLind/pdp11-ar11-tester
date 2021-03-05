@@ -1,0 +1,24 @@
+OUTPUT_FORMAT("a.out-pdp11")
+phys = 00000200;
+SECTIONS
+{
+  .text phys : AT(phys) {
+    code = .;
+    *(.text)
+    *(.rodata)
+    . = ALIGN(2);
+  }
+  .data : AT(phys + (data - code))
+  {
+    data = .;
+    *(.data)
+    . = ALIGN(2);
+  }
+  .bss : AT(phys + (bss - code))
+  {
+    bss = .;
+    *(.bss)
+    . = ALIGN(2);
+  }
+  end = .;
+}
