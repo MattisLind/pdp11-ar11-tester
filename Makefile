@@ -11,29 +11,29 @@ AS=pdp11-aout-as
 .PHONY: clean
 
 clean:
-	@rm -f crt0.o printf.o test1.o ashlhi3.o divmulmod.o
-	@rm -f test1.out test1.data test1.text test1.textabs test1.dataabs test1.abs
+	@rm -f crt0.o printf.o *.o ashlhi3.o divmulmod.o
+	@rm -f *.out *.data *.text *.textabs *.dataabs *.abs
 
-test1.abs: test1.textabs test1.dataabs
+%.abs: %.textabs %.dataabs
 	@cat $^ > $@
 
-test1.textabs: test1.text test1.out
-	CODE=`pdp11-aout-objdump  -t test1.out | cut -d ' ' -f 1,13 | grep code | cut -d ' ' -f 1`; \
+%.textabs: %.text %.out
+	CODE=`pdp11-aout-objdump  -t $(word 2,$^)  | cut -d ' ' -f 1,13 | grep code | cut -d ' ' -f 1`; \
 	bin2abs $< 0x$$CODE > $@
 
-test1.dataabs: test1.data test1.out
-	DATA=`pdp11-aout-objdump  -t test1.out | cut -d ' ' -f 1,13 | grep data | cut -d ' ' -f 1`; \
+%.dataabs: %.data %.out
+	DATA=`pdp11-aout-objdump  -t $(word 2,$^) | cut -d ' ' -f 1,13 | grep data | cut -d ' ' -f 1`; \
 	bin2abs $< 0x$$DATA > $@
 
-test1.text: test1.out 
+%.text: %.out 
 	pdp11-aout-objcopy -j .text -O binary $^ $@
 
-test1.data: test1.out 
+%.data: %.out 
 	pdp11-aout-objcopy -j .data -O binary $^ $@
 
 # to get the rigt order in the binary crt0.s has to be the first file
 
-test1.out: crt0.o test1.o printf.o divmulmod.o ashlhi3.o
+%.out: crt0.o %.o printf.o divmulmod.o ashlhi3.o
 	pdp11-aout-ld   -T linker-script   -nostartfiles  -nodefaultlibs  -nostdlib  $^  -o $@
 
 
