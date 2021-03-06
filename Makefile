@@ -11,28 +11,29 @@ AS=pdp11-aout-as
 .PHONY: clean
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f crt0.o printf.o test1.o ashlhi3.o divmulmod.o
+	@rm -f test1.out test1.data test1.text test1.textabs test1.dataabs test1.abs
 
-test1.abs: papertape-pdp11.textabs papertape-pdp11.dataabs
+test1.abs: test1.textabs test1.dataabs
 	@cat $^ > $@
 
-test1.textabs: papertape-pdp11.text
-	@CODE=`pdp11-aout-objdump  -t papertape-pdp11.o | cut -d ' ' -f 1,13 | grep code | cut -d ' ' -f 1`; \
-	bin2abs $^ 0x$$CODE 0 > $@
+test1.textabs: test1.text test1.out
+	CODE=`pdp11-aout-objdump  -t test1.out | cut -d ' ' -f 1,13 | grep code | cut -d ' ' -f 1`; \
+	bin2abs $< 0x$$CODE > $@
 
-test1.dataabs: papertape-pdp11.data
-	@DATA=`pdp11-aout-objdump  -t papertape-pdp11.o | cut -d ' ' -f 1,13 | grep data | cut -d ' ' -f 1`; \
-	bin2abs $^ 0x$$DATA 1 > $@
+test1.dataabs: test1.data test1.out
+	DATA=`pdp11-aout-objdump  -t test1.out | cut -d ' ' -f 1,13 | grep data | cut -d ' ' -f 1`; \
+	bin2abs $< 0x$$DATA > $@
 
-test1.text: papertape-pdp11.o 
-	@pdp11-aout-objcopy -j .text -O binary $^ $@
+test1.text: test1.out 
+	pdp11-aout-objcopy -j .text -O binary $^ $@
 
-test1.data: papertape-pdp11.o 
+test1.data: test1.out 
 	pdp11-aout-objcopy -j .data -O binary $^ $@
 
 # to get the rigt order in the binary crt0.s has to be the first file
 
-test1.o: crt0.o papertape.o pdp11-main.o
-	@pdp11-aout-ld   -T linker-script   -nostartfiles  -nodefaultlibs  -nostdlib  $^  -o $@
+test1.out: crt0.o test1.o printf.o divmulmod.o ashlhi3.o
+	pdp11-aout-ld   -T linker-script   -nostartfiles  -nodefaultlibs  -nostdlib  $^  -o $@
 
 

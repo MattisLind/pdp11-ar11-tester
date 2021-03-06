@@ -1,3 +1,5 @@
+#include "printf.h"
+
 #define CONSOLE_RX_CS 0177560
 #define CONSOLE_RX_DB 0177562
 #define CONSOLE_TX_CS 0177564
@@ -38,12 +40,13 @@ char getchar () {
   return (*((volatile int *) (CONSOLE_RX_DB))) & 0x7f;
 }
 
-void main ()
+int main ()
 {
   init_printf((void *) 0, putch);
   while (1) {
     printf ("%d %d %d %d\n", getAD(0), getAD(1), getAD(2), getAD(3));
   }
+  return 0;
 }
 
 
