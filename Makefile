@@ -3,7 +3,7 @@ AS=pdp11-aout-as
 
 
 %.o:%.c
-	$(CC) -c -Os -m10 -msoft-float -nostartfiles  -nodefaultlibs  -nostdlib -o $@ $^
+	$(CC) -c -O3 -m10 -msoft-float -nostartfiles  -nodefaultlibs  -nostdlib -o $@ $^
 
 %.o:%.s
 	$(AS) -o $@ $^
@@ -33,7 +33,11 @@ clean:
 
 # to get the rigt order in the binary crt0.s has to be the first file
 
+#%.out: crt0.o %.o printf.o divmulmod.o ashlhi3.o
+#	pdp11-aout-ld   -T linker-script   -nostartfiles  -nodefaultlibs  -nostdlib  $^  -o $@
+
+test4.out: crt0.o test4.o
+	pdp11-aout-ld   -T linker-script   -nostartfiles  -nodefaultlibs  -nostdlib $^  -o $@
+
 %.out: crt0.o %.o printf.o divmulmod.o ashlhi3.o
 	pdp11-aout-ld   -T linker-script   -nostartfiles  -nodefaultlibs  -nostdlib  $^  -o $@
-
-
